@@ -18,6 +18,9 @@ class SerialReader(threading.Thread):
                 if data:
                     for q in self.queues:
                         q.put(data)
+                    if "End" in data:
+                        time.sleep(0.1)  
+                        self.stop_event.set()
         except serial.SerialException:
             self.stop_event.set()
 
@@ -39,9 +42,6 @@ class MonitorThread(threading.Thread):
                     ts = time.strftime("%d-%m-%Y %H:%M:%S")
                     print(f"{self.monitor_name} found '{self.keyword}'!")
                     self.report_queue.put((self.keyword, ts))
-                if "End" in data:
-                    time.sleep(0.1)
-                    self.stop_event.set()
             except queue.Empty:
                 continue
 
